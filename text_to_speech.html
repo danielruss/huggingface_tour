@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+</head>
+
+<body>
+
+    <textarea type="text" id="tosay"></textarea>
+    <select id="selected_voice">
+        <option value="af">Default</option>
+        <option value="af_bella">Bella</option>
+        <option value="af_nicole">Nicole</option>
+        <option value="af_sarah">Sarah</option>
+        <option value="af_sky">Sky</option>
+        <option value="am_adam">Adam</option>
+        <option value="am_michael">Michael</option>
+        <option value="bf_emma">Emma</option>
+        <option value="bf_isbella">Isabella</option>
+        <option value="bm_george">George</option>
+        <option value="bm_lewis">Lewis</option>
+    </select>
+    <button id="play">play</button>
+    <label for="savex">save audio</label><input type="checkbox" id="savex" checked>
+    <script type="module">
+
+
+        import { KokoroTTS } from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.0.1/+esm'
+        import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers";
+
+
+        async function sayit(event) {
+            play.disabled = true;
+            console.log(KokoroTTS)
+            const model_id = "onnx-community/Kokoro-82M-ONNX";
+            const tts = await KokoroTTS.from_pretrained(model_id, {
+                dtype: "q8", // Options: "fp32", "fp16", "q8", "q4", "q4f16"
+            });
+            console.log(tts)
+            const text = tosay.value.trim().length > 0 ? tosay.value : "you did not give me any text";
+            const voice = selected_voice.value
+            console.log(`converting ${text} to audio`)
+            audiodiv.innerText = text
+            console.time("audio")
+
+            const audio = await tts.generate(text, {
+                // Use `tts.list_voices()` to list all available voices
+                voice: voice,
+            });
+            console.timeEnd("audio")
+
+
+
+            // Create a Blob from the audio data
+            const blob = new Blob([audio.toWav()], { type: 'audio/wav' });
+
+            // Create a URL for the Blob
+            const url = URL.createObjectURL(blob);
+
+            // Create a new Audio object
+            const audioElement = new Audio(url);
+
+            // Play the audio
+            audioElement.play();
+
+            if (savex.checked) {
+                // this downloads audio.wav
+                audio.save("audio.wav");
+            }
+
+            play.disabled = false;
+
+
+        }
+        play.addEventListener("click", sayit)
+
+    </script>
+
+    <div id="audiodiv"></div>
+
+</body>
+
+</html>
