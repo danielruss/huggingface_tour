@@ -13,6 +13,7 @@ const langs = {
     nl: "nld_Latn",
     pt: "por_Latn",
     he: "heb_Hebr",
+    hi: "hin_Deva"
 }
 
 const translation_pipeline2 = await pipeline("translation", 'Xenova/m2m100_418M');
@@ -23,6 +24,7 @@ const langs2 = {
     nl: "nl",
     pt: "pt",
     he: "he",
+    hi: "hi",
 }
 
 
